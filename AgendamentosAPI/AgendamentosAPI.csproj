@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+    <PropertyGroup>
+        <TargetFramework>net10.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Google.Apis.Calendar.v3" Version="1.75.0.4206" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
+        <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.10">
+          <PrivateAssets>all</PrivateAssets>
+          <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+        </PackageReference>
+        <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
+        <PackageReference Include="Scalar.AspNetCore" Version="2.16.17" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Adapters\Controllers\" />
+      <Folder Include="Adapters\Infrastructure\ExternalServices\" />
+      <Folder Include="Adapters\Infrastructure\Repositories\" />
+      <Folder Include="Domain\Entities\Enums\" />
+      <Folder Include="Domain\Services\" />
+      <Folder Include="Dtos\" />
+    </ItemGroup>
+
+</Project>
