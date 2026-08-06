@@ -21,10 +21,8 @@
     <ItemGroup>
       <Folder Include="Adapters\Controllers\" />
       <Folder Include="Adapters\Infrastructure\ExternalServices\" />
-      <Folder Include="Adapters\Infrastructure\Repositories\" />
       <Folder Include="Domain\Entities\Enums\" />
       <Folder Include="Domain\Services\" />
-      <Folder Include="Dtos\" />
     </ItemGroup>
 
 </Project>
