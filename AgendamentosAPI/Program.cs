@@ -1,41 +1,42 @@
+using AgendamentosAPI.Adapters.Infrastructure;
+using AgendamentosAPI.Adapters.Infrastructure.Repositories;
+using AgendamentosAPI.Domain.Ports;
+using Microsoft.EntityFrameworkCore;
+using Scalar.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+
 builder.Services.AddOpenApi();
+
+// "options" passa a string de conexão, senha e tudo mais que eu definir no program 
+// que essa conexão deva ter
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    /*
+        devo informar:
+            - o banco que estou usando passando um .Use[Nome do banco ou depência que
+            adiciona ele]
+            - acessar o doc de configurações e inserir o caminho até a string de conexão
+    */
+    options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
+
+builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddProblemDetails();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.MapScalarApiReference();
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
+app.UseExceptionHandler();
+app.MapControllers();
 
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-    {
-        var forecast = Enumerable.Range(1, 5).Select(index =>
-                new WeatherForecast
-                (
-                    DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-                    Random.Shared.Next(-20, 55),
-                    summaries[Random.Shared.Next(summaries.Length)]
-                ))
-            .ToArray();
-        return forecast;
-    })
-    .WithName("GetWeatherForecast");
 
 app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
