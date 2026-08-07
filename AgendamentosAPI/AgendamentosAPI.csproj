@@ -22,7 +22,6 @@
       <Folder Include="Adapters\Controllers\" />
       <Folder Include="Adapters\Infrastructure\ExternalServices\" />
       <Folder Include="Domain\Entities\Enums\" />
-      <Folder Include="Domain\Services\" />
     </ItemGroup>
 
 </Project>
