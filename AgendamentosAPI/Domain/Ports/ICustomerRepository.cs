@@ -11,5 +11,5 @@ public interface ICustomerRepository
     Task<CustomerOutDto> ListCustomersAsync();
     
     // Apenas para testes:
-    Task DeletCustomerAsync(Guid id);
+    Task DeleteCustomerAsync(Guid id);
 }
