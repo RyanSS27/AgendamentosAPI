@@ -1,6 +1,7 @@
 using AgendamentosAPI.Adapters.Infrastructure;
 using AgendamentosAPI.Adapters.Infrastructure.Repositories;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
 
@@ -22,6 +23,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     );
 
 builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
+builder.Services.AddScoped<IServiceProviderService, ServiceProviderService>();
+builder.Services.AddControllers();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
