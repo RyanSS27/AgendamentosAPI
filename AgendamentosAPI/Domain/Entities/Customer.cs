@@ -32,8 +32,10 @@ public class Customer
 
         Name = name;
         Cpf = cpf;
-        _phoneNumbers = phoneNumbers;
+        _phoneNumbers = phoneNumbers ?? [];
     }
+    
+    protected Customer() {}
 
     public void ChangeName(string newName)
     {
