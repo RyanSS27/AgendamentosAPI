@@ -9,9 +9,11 @@ namespace AgendamentosAPI.Adapters.Controllers;
 public class ServiceProviderController(IServiceProviderService serviceProviderService) : ControllerBase
 {
     [HttpPost]
-    public async Task<IActionResult> AddServiceProver(ServiceProviderInputDto provider)
+    public async Task<IActionResult> AddServiceProver(ServiceProviderInputDto input)
     {
-        return Ok(await serviceProviderService.AddServiceProviderAsync(provider));
+        var provider = await serviceProviderService.AddServiceProviderAsync(input);
+        
+        return CreatedAtAction(nameof(GetServiceProvider), new { id = provider.Id }, provider);
     }
     
     [HttpGet("{id:guid}")]
@@ -21,9 +23,9 @@ public class ServiceProviderController(IServiceProviderService serviceProviderSe
     }
 
     [HttpPost("{id:guid}")]
-    public async Task<IActionResult> UpdateServiceProvider(Guid id, ServiceProviderInputDto provider)
+    public async Task<IActionResult> UpdateServiceProvider(Guid id, ServiceProviderInputDto input)
     {
-        return Ok(await serviceProviderService.UpdateServiceProviderAsync(id, provider));
+        return Ok(await serviceProviderService.UpdateServiceProviderAsync(id, input));
     }
 
     [HttpDelete("{id:guid}")]

@@ -5,7 +5,7 @@ using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
 
 namespace AgendamentosAPI.Domain.Services;
 
-public class ServiceProviderService(IServiceProviderRepository serviceProviderRepository) : IServiceProviderService 
+public class ServiceProviderService(IServiceProviderRepository repository) : IServiceProviderService 
 {
     public async Task<ServiceProviderOutDto> AddServiceProviderAsync(ServiceProviderInputDto input)
     {
@@ -14,13 +14,13 @@ public class ServiceProviderService(IServiceProviderRepository serviceProviderRe
             input.Email
         );
         
-        await serviceProviderRepository.AddServiceProviderAsync(provider);
+        await repository.AddServiceProviderAsync(provider);
         return MapToOutDto(provider);
     }
 
     public async Task<ServiceProviderOutDto> GetServiceProviderByIdAsync(Guid id)
     {
-        var provider = await serviceProviderRepository.GetServiceProviderByIdAsync(id);
+        var provider = await repository.GetServiceProviderByIdAsync(id);
 
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
@@ -30,14 +30,14 @@ public class ServiceProviderService(IServiceProviderRepository serviceProviderRe
 
     public async Task<ServiceProviderOutDto> UpdateServiceProviderAsync(Guid id, ServiceProviderInputDto input)
     {
-        var provider = await serviceProviderRepository.GetServiceProviderByIdAsync(id);
+        var provider = await repository.GetServiceProviderByIdAsync(id);
 
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
 
         provider.UpdateDetails(input.Name, input.Email); 
         
-        await serviceProviderRepository.UpdateServiceProviderAsync(provider);
+        await repository.UpdateServiceProviderAsync(provider);
 
         return MapToOutDto(provider);
     }
@@ -49,12 +49,12 @@ public class ServiceProviderService(IServiceProviderRepository serviceProviderRe
 
     public async Task DeleteServiceProviderAsync(Guid id)
     {
-        var provider = await serviceProviderRepository.GetServiceProviderByIdAsync(id);
+        var provider = await repository.GetServiceProviderByIdAsync(id);
 
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
 
-        await serviceProviderRepository.DeleteServiceProviderAsync(provider);
+        await repository.DeleteServiceProviderAsync(provider);
     }
 
     private static ServiceProviderOutDto MapToOutDto(ServiceProvider provider)
