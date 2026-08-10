@@ -1,4 +1,5 @@
-using System.Collections.ObjectModel;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using AgendamentosAPI.Domain.Exceptions;
 
@@ -10,12 +11,12 @@ public class Customer
     public string Name { get; private set; }
     public string Cpf { get; private set; }
     
-    private readonly Collection<string> _phoneNumbers;
-    public IReadOnlyCollection<string> PhoneNumbers => _phoneNumbers.AsReadOnly();
+    private readonly List<string> _phoneNumbers = [];
+    public IReadOnlyCollection<string> PhoneNumbers => _phoneNumbers?.AsReadOnly() ?? [];
 
     public bool IsActive { get; private set; } = true;
 
-    public Customer(string name, string cpf, Collection<string>? phoneNumbers)
+    public Customer(string name, string cpf, List<string>? phoneNumbers)
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("É necessário informar o nome do cliente.");
@@ -24,19 +25,41 @@ public class Customer
         
         if (phoneNumbers is null || !phoneNumbers.Any())
             throw new DomainException("O cliente deve ter no mínimo 1 número de contato.");
+        
+        var uniquePhones = phoneNumbers.Distinct().ToList();
 
-        foreach (var phone in phoneNumbers)
+        foreach (var phone in uniquePhones)
         {
             ValidatePhoneNumber(phone);
         }
 
         Name = name;
         Cpf = cpf;
-        _phoneNumbers = phoneNumbers ?? [];
+        _phoneNumbers = uniquePhones;
     }
     
     protected Customer() {}
+    
+    public void UpdateDetails(string name, string cpf, List<string> phoneNumbers)
+    {
+        ChangeName(name);
 
+        if (Cpf != cpf)
+            CorrectCpf(cpf);
+
+        if (phoneNumbers is null || !phoneNumbers.Any())
+            throw new DomainException("O cliente deve ter no mínimo 1 número de contato.");
+
+        var uniquePhones = phoneNumbers.Distinct().ToList();
+        
+        foreach (var phone in uniquePhones)
+            ValidatePhoneNumber(phone);
+        
+        
+        _phoneNumbers.Clear();
+        _phoneNumbers.AddRange(uniquePhones);
+    }
+    
     public void ChangeName(string newName)
     {
         if (string.IsNullOrWhiteSpace(newName))
@@ -55,16 +78,34 @@ public class Customer
 
     public void RemovePhoneNumber(string phoneNumber)
     {
+        if (_phoneNumbers.Count == 1)
+            throw new DomainException("O cliente deve conter ao menos um telefone de contato. Não é possível remover o último.");
+        
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new DomainException("O número de telefone deve ser válido para remoção.");
 
         if (!_phoneNumbers.Contains(phoneNumber))
             throw new DomainException("Este número não pertence ao cliente.");
-        
-        if (_phoneNumbers.Count == 1)
-            throw new DomainException("O cliente deve conter ao menos um telefone de contato. Não é possível remover o último.");
+
 
         _phoneNumbers.Remove(phoneNumber);
+    }
+    
+    public void ChangePhoneNumber(string oldNumber, string newNumber)
+    {
+        if (string.IsNullOrWhiteSpace(oldNumber) || string.IsNullOrWhiteSpace(newNumber))
+            throw new DomainException("Tanto o número antigo quanto o novo devem ser informados.");
+
+        if (!_phoneNumbers.Contains(oldNumber))
+            throw new DomainException("O número antigo não pertence a este cliente.");
+
+        ValidatePhoneNumber(newNumber);
+
+        if (_phoneNumbers.Contains(newNumber))
+            throw new DomainException("O novo número já está cadastrado para este cliente.");
+        
+        _phoneNumbers.Remove(oldNumber);
+        _phoneNumbers.Add(newNumber);
     }
     
     public void InactiveAccount()
@@ -101,7 +142,6 @@ public class Customer
         if (!phoneRegex.IsMatch(cleanPhone))
              throw new DomainException("O formato do telefone é inválido (deve conter o DDD e o número).");
     }
-    
     
     public void CorrectCpf(string correctCpf)
     {
