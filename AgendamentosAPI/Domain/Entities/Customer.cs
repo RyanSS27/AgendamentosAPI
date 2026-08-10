@@ -4,7 +4,7 @@ using AgendamentosAPI.Domain.Exceptions;
 
 namespace AgendamentosAPI.Domain.Entities;
 
-public class Patient
+public class Customer
 {
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string Name { get; private set; }
@@ -15,15 +15,15 @@ public class Patient
 
     public bool IsActive { get; private set; } = true;
 
-    public Patient(string name, string cpf, Collection<string>? phoneNumbers)
+    public Customer(string name, string cpf, Collection<string>? phoneNumbers)
     {
         if (string.IsNullOrWhiteSpace(name))
-            throw new DomainException("É necessário informar o nome do paciente.");
+            throw new DomainException("É necessário informar o nome do cliente.");
         
         ValidateCpf(cpf);
         
         if (phoneNumbers is null || !phoneNumbers.Any())
-            throw new DomainException("O paciente deve ter no mínimo 1 número de contato.");
+            throw new DomainException("O cliente deve ter no mínimo 1 número de contato.");
 
         foreach (var phone in phoneNumbers)
         {
@@ -32,8 +32,10 @@ public class Patient
 
         Name = name;
         Cpf = cpf;
-        _phoneNumbers = phoneNumbers;
+        _phoneNumbers = phoneNumbers ?? [];
     }
+    
+    protected Customer() {}
 
     public void ChangeName(string newName)
     {
@@ -57,10 +59,10 @@ public class Patient
             throw new DomainException("O número de telefone deve ser válido para remoção.");
 
         if (!_phoneNumbers.Contains(phoneNumber))
-            throw new DomainException("Este número não pertence ao paciente.");
+            throw new DomainException("Este número não pertence ao cliente.");
         
         if (_phoneNumbers.Count == 1)
-            throw new DomainException("O paciente deve conter ao menos um telefone de contato. Não é possível remover o último.");
+            throw new DomainException("O cliente deve conter ao menos um telefone de contato. Não é possível remover o último.");
 
         _phoneNumbers.Remove(phoneNumber);
     }

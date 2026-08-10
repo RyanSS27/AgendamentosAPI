@@ -1,10 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
     <PropertyGroup>
         <TargetFramework>net10.0</TargetFramework>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-    </PropertyGroup>
+      <UserSecretsId>78168762-2347-4cbe-8f97-55c82d4b03fb</UserSecretsId>
+  </PropertyGroup>
 
     <ItemGroup>
         <PackageReference Include="Google.Apis.Calendar.v3" Version="1.75.0.4206" />
@@ -19,12 +20,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Folder Include="Adapters\Controllers\" />
       <Folder Include="Adapters\Infrastructure\ExternalServices\" />
-      <Folder Include="Adapters\Infrastructure\Repositories\" />
       <Folder Include="Domain\Entities\Enums\" />
-      <Folder Include="Domain\Services\" />
-      <Folder Include="Dtos\" />
     </ItemGroup>
 
 </Project>
