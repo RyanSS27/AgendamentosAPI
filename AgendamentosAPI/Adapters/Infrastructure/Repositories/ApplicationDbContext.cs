@@ -11,4 +11,13 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     
     public DbSet<Customer> Customers { get; set; }
     public DbSet<ServiceProvider> ServiceProviders { get; set; }
+    
+    
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+    
+        // Varre o assembly atual e aplica todas as classes que implementam IEntityTypeConfiguration
+        modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
+    }
 }

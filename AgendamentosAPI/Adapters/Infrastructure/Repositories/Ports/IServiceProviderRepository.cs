@@ -1,6 +1,6 @@
 using AgendamentosAPI.Dtos;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
-namespace AgendamentosAPI.Domain.Ports;
+namespace AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 
 public interface IServiceProviderRepository
 {
