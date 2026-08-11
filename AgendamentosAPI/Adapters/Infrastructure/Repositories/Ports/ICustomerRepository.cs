@@ -1,7 +1,7 @@
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Dtos;
 
-namespace AgendamentosAPI.Adapters.Infrastructure.Repositories;
+namespace AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 
 public interface ICustomerRepository
 {

@@ -1,3 +1,4 @@
+using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
