@@ -22,14 +22,14 @@ Nosso desenvolvimento está focado em entregas incrementais (MVP). Acompanhe o p
   - [x] Modelagem genérica da entidade `ServiceProvider`.
   - [x] Modelagem genérica da entidade `Customer`.
   - [x] Implementação de Exceptions customizadas (`DomainException`).
-- [ ] **Fase 2: Persistência (Próximo Passo)**
-  - [ ] Criação das interfaces de repositório (`Ports`).
-  - [ ] Configuração do `ApplicationDbContext` (EF Core).
-  - [ ] Mapeamento fluente das entidades para o PostgreSQL.
-  - [ ] Geração e aplicação das *Migrations*.
-- [ ] **Fase 3: Casos de Uso (CRUDs)**
-  - [ ] Endpoints para cadastro e gestão de `ServiceProvider`.
-  - [ ] Endpoints para cadastro e gestão de `Customer`.
+- [x] **Fase 2: Persistência (Próximo Passo)**
+  - [x] Criação das interfaces de repositório (`Ports`).
+  - [x] Configuração do `ApplicationDbContext` (EF Core).
+  - [x] Mapeamento fluente das entidades para o PostgreSQL.
+  - [x] Geração e aplicação das *Migrations*.
+- [x] **Fase 3: Casos de Uso (CRUDs)**
+  - [x] Endpoints para cadastro e gestão de `ServiceProvider`.
+  - [x] Endpoints para cadastro e gestão de `Customer`.
 - [ ] **Fase 4: Agendamentos e Integração**
   - [ ] Modelagem da entidade `Appointment` (Agendamento).
   - [ ] Lógica de conflito de horários e regras de negócio.
