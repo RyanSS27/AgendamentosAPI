@@ -2,7 +2,6 @@ using AgendamentosAPI.Adapters.Infrastructure.Repositories;
 using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Exceptions;
-using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
 
 namespace AgendamentosAPI.Domain.Services;
@@ -45,9 +44,15 @@ public class CustomerService(ICustomerRepository repository) : ICustomerService
         return MapToOutDto(customer);
     }
 
-    public async Task<List<CustomerOutDto>> ListCustomersAsync()
+    public async Task<List<CustomerSummaryOutDto>> ListCustomersAsync(int? limit)
     {
-        throw new NotImplementedException();
+        if (limit is null || limit <= 0)
+            return [];
+        
+        if (limit > 25)
+            limit = 25;
+
+        return await repository.ListCustomersAsync(limit.Value);
     }
 
     public async Task DeleteCustomerAsync(Guid id)

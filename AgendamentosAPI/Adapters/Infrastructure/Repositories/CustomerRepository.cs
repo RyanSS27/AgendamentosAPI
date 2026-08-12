@@ -1,6 +1,5 @@
 using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Entities;
-using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,9 +24,14 @@ public class CustomerRepository(ApplicationDbContext context) : ICustomerReposit
         await context.SaveChangesAsync();
     }
 
-    public async Task<CustomerOutDto> ListCustomersAsync()
+    public async Task<List<CustomerSummaryOutDto>> ListCustomersAsync(int limit)
     {
-        throw new NotImplementedException();
+        return await context.Customers
+            .OrderByDescending(c => c.IsActive)
+            .ThenBy(c => c.Name)
+            .Select(c => new CustomerSummaryOutDto(c.Id, c.Name, c.Cpf, c.IsActive))
+            .Take(limit)
+            .ToListAsync();
     }
 
     public async Task DeleteCustomerAsync(Customer customer)

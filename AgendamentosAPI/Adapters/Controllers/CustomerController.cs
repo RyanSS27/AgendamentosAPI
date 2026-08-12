@@ -1,4 +1,4 @@
-using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Services;
 using AgendamentosAPI.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -34,5 +34,11 @@ public class CustomerController(ICustomerService customerService) : ControllerBa
         await customerService.DeleteCustomerAsync(id);
         
         return NoContent(); 
+    }
+
+    [HttpGet("list/{limit:int}")]
+    public async Task<IActionResult> ListCustomers(int? limit)
+    {
+        return Ok(await customerService.ListCustomersAsync(limit));
     }
 }

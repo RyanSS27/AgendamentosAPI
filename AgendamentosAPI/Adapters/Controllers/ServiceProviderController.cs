@@ -1,4 +1,4 @@
-using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Services;
 using AgendamentosAPI.Dtos;
 using Microsoft.AspNetCore.Mvc;
 
@@ -22,7 +22,7 @@ public class ServiceProviderController(IServiceProviderService serviceProviderSe
         return Ok(await serviceProviderService.GetServiceProviderByIdAsync(id));
     }
 
-    [HttpPost("{id:guid}")]
+    [HttpPut("{id:guid}")]
     public async Task<IActionResult> UpdateServiceProvider(Guid id, ServiceProviderInputDto input)
     {
         return Ok(await serviceProviderService.UpdateServiceProviderAsync(id, input));
@@ -33,5 +33,11 @@ public class ServiceProviderController(IServiceProviderService serviceProviderSe
     {
         await serviceProviderService.DeleteServiceProviderAsync(id);
         return NoContent();
+    }
+
+    [HttpGet("list/{limit:int}")]
+    public async Task<IActionResult> ListCustomers(int? limit)
+    {
+        return Ok(await serviceProviderService.ListServiceProvidersAsync(limit));
     }
 }

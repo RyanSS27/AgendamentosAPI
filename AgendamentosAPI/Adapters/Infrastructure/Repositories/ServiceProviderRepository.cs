@@ -1,6 +1,5 @@
 using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Exceptions;
-using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
 using Microsoft.EntityFrameworkCore;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
@@ -26,9 +25,14 @@ public class ServiceProviderRepository(ApplicationDbContext context) : IServiceP
         await context.SaveChangesAsync();
     }
 
-    public Task<List<ServiceProviderOutDto>> ListServiceProvidersAsync()
+    public async Task<List<ProviderSummaryOutDto>> ListServiceProvidersAsync(int limit)
     {
-        throw new NotImplementedException();
+        return await context.ServiceProviders
+            .OrderByDescending(p => p.IsActive)
+            .ThenBy(p => p.Name)
+            .Select(p => new ProviderSummaryOutDto(p.Id, p.Name, p.IsActive))
+            .Take(limit)
+            .ToListAsync();
     }
 
     public async Task DeleteServiceProviderAsync(ServiceProvider serviceProvider)
