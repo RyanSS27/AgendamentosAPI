@@ -1,13 +1,14 @@
 using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Exceptions;
-using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
 
 namespace AgendamentosAPI.Domain.Services;
 
-public class ServiceProviderService(IServiceProviderRepository repository) : IServiceProviderService 
+public class ServiceProviderService(IServiceProviderRepository repository) : IServiceProviderService
 {
+    public readonly int LimitPerRequest = 25;
+    
     public async Task<ServiceProviderOutDto> AddServiceProviderAsync(ServiceProviderInputDto input)
     {
         var provider = new ServiceProvider(
@@ -43,9 +44,15 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
         return MapToOutDto(provider);
     }
 
-    public Task<List<ServiceProviderOutDto>> ListServiceProvidersAsync()
+    public async Task<List<ProviderSummaryOutDto>> ListServiceProvidersAsync(int? limit)
     {
-        throw new NotImplementedException();
+        if (limit is null || limit <= 0)
+            return [];
+
+        if (limit > 25)
+            limit = LimitPerRequest;
+
+        return await repository.ListServiceProvidersAsync(limit.Value);
     }
 
     public async Task DeleteServiceProviderAsync(Guid id)
