@@ -8,7 +8,7 @@ public interface ICustomerRepository
     Task AddCustomerAsync(Customer customer);
     Task<Customer?> GetCustomerByIdAsync(Guid id);
     Task UpdateCustomerAsync(Customer customer);
-    Task<CustomerOutDto> ListCustomersAsync();
+    Task<List<CustomerSummaryOutDto>> ListCustomersAsync(int limit);
     
     // Apenas para testes:
     Task DeleteCustomerAsync(Customer customer);

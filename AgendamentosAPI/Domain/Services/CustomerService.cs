@@ -45,9 +45,15 @@ public class CustomerService(ICustomerRepository repository) : ICustomerService
         return MapToOutDto(customer);
     }
 
-    public async Task<List<CustomerOutDto>> ListCustomersAsync()
+    public async Task<List<CustomerSummaryOutDto>> ListCustomersAsync(int? limit)
     {
-        throw new NotImplementedException();
+        if (limit is null || limit > 25)
+            limit = 25;
+        
+        if (limit <= 0)
+            return [];
+
+        return await repository.ListCustomersAsync(limit.Value);
     }
 
     public async Task DeleteCustomerAsync(Guid id)
