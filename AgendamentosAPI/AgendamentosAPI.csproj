@@ -21,7 +21,6 @@
 
     <ItemGroup>
       <Folder Include="Adapters\Infrastructure\ExternalServices\" />
-      <Folder Include="Domain\Entities\Enums\" />
     </ItemGroup>
 
 </Project>

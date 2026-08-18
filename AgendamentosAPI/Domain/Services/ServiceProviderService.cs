@@ -13,7 +13,10 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
     {
         var provider = new ServiceProvider(
             input.Name,
-            input.Email
+            input.Email,
+            input.WorkStartTime,
+            input.WorkEndTime,
+            input.CalendarId
         );
         
         await repository.AddServiceProviderAsync(provider);
@@ -37,7 +40,7 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
 
-        provider.UpdateDetails(input.Name, input.Email); 
+        provider.UpdateDetails(input.Name, input.Email, input.WorkStartTime, input.WorkEndTime); 
         
         await repository.UpdateServiceProviderAsync(provider);
 
