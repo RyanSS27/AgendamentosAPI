@@ -1,9 +1,10 @@
-using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.ServiceProvider;
 
 namespace AgendamentosAPI.Domain.Services;
 
 public interface IServiceProviderService
 {
+    // CRUD
     Task <ServiceProviderOutDto>  AddServiceProviderAsync(ServiceProviderInputDto providerInput);
     Task<ServiceProviderOutDto> GetServiceProviderByIdAsync(Guid id);
     Task<ServiceProviderOutDto> UpdateServiceProviderAsync(Guid id, ServiceProviderInputDto providerInput);

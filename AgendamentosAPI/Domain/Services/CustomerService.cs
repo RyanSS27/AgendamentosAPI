@@ -1,8 +1,9 @@
 using AgendamentosAPI.Adapters.Infrastructure.Repositories;
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Exceptions;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.Customer;
 
 namespace AgendamentosAPI.Domain.Services;
 

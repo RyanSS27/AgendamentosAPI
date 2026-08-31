@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AgendamentosAPI.Dtos;
+namespace AgendamentosAPI.Dtos.ServiceProvider;
 
 public record ServiceProviderInputDto(
     [Required(ErrorMessage = "O nome é obrigatório.")]

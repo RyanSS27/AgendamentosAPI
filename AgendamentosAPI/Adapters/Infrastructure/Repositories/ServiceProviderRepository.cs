@@ -1,6 +1,7 @@
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Exceptions;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.ServiceProvider;
 using Microsoft.EntityFrameworkCore;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
 

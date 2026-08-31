@@ -1,4 +1,4 @@
-namespace AgendamentosAPI.Dtos;
+namespace AgendamentosAPI.Dtos.Customer;
 
 public record CustomerOutDto(
     Guid Id, 

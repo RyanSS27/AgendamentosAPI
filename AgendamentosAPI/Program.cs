@@ -1,6 +1,7 @@
 using AgendamentosAPI.Adapters.Infrastructure;
+using AgendamentosAPI.Adapters.Infrastructure.ExternalServices;
 using AgendamentosAPI.Adapters.Infrastructure.Repositories;
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
