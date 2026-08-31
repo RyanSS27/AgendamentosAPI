@@ -37,7 +37,7 @@ namespace AgendamentosAPI.Migrations
                     b.Property<DateTime>("End")
                         .HasColumnType("timestamp with time zone");
 
-                    b.Property<string>("ExternalCalendarId")
+                    b.Property<string>("ExternalEventId")
                         .HasColumnType("text");
 
                     b.Property<string>("Observations")

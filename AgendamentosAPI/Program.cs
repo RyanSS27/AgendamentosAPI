@@ -27,6 +27,9 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
 builder.Services.AddScoped<IServiceProviderService, ServiceProviderService>();
+// Registra o Provider de Token e o Adapter do Calendar
+builder.Services.AddScoped<IGoogleTokenProvider, GoogleServiceAccountTokenProvider>();
+builder.Services.AddScoped<ICalendarIntegrationPort, GoogleCalendarAdapter>();
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
