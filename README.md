@@ -31,11 +31,15 @@ Nosso desenvolvimento está focado em entregas incrementais (MVP). Acompanhe o p
   - [x] Endpoints para cadastro e gestão de `ServiceProvider`.
   - [x] Endpoints para cadastro e gestão de `Customer`.
 - [ ] **Fase 4: Agendamentos e Integração**
-  - [ ] Modelagem da entidade `Appointment` (Agendamento).
+  - [x] Modelagem da entidade `Appointment` (Agendamento).
+  - [x] Implementação do `GoogleCalendarAdapter` com o SDK oficial do Google.
   - [ ] Lógica de conflito de horários e regras de negócio.
-  - [ ] Implementação do `GoogleCalendarAdapter` com o SDK oficial do Google.
   - [ ] Endpoint de criação de agendamento com sincronização externa.
-
+- [ ] **Fase 5: Testes e Integração com Bot de Atendimentos N8N**
+  - [ ] Testes em ambiente controlado das funcionalidades principais da API.
+  - [ ] Correções e documentação das funcionalidades básicas.
+  - [ ] Conectar com o bot de atendimento.
+  - [ ] Review das funcionalidades e refatoração. 
 ---
 
 ## 🛠️ Tecnologias
