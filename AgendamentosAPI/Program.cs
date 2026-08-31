@@ -1,6 +1,7 @@
 using AgendamentosAPI.Adapters.Infrastructure;
+using AgendamentosAPI.Adapters.Infrastructure.ExternalServices;
 using AgendamentosAPI.Adapters.Infrastructure.Repositories;
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Domain.Services;
 using Microsoft.EntityFrameworkCore;
 using Scalar.AspNetCore;
@@ -26,7 +27,15 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
 builder.Services.AddScoped<IServiceProviderService, ServiceProviderService>();
-builder.Services.AddControllers();
+// Registra o Provider de Token e o Adapter do Calendar
+builder.Services.AddScoped<IGoogleTokenProvider, GoogleServiceAccountTokenProvider>();
+builder.Services.AddScoped<ICalendarIntegrationPort, GoogleCalendarAdapter>();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        // Permite receber string via controller para Enums (não ficar recebendo só numeros)
+        options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
+    });
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 

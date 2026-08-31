@@ -8,6 +8,8 @@
   </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="Flurl.Http" Version="4.0.2" />
+        <PackageReference Include="Google.Apis.Auth" Version="1.76.0" />
         <PackageReference Include="Google.Apis.Calendar.v3" Version="1.75.0.4206" />
         <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.10" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="10.0.10" />
@@ -17,11 +19,6 @@
         </PackageReference>
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.3" />
         <PackageReference Include="Scalar.AspNetCore" Version="2.16.17" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Adapters\Infrastructure\ExternalServices\" />
-      <Folder Include="Domain\Entities\Enums\" />
     </ItemGroup>
 
 </Project>

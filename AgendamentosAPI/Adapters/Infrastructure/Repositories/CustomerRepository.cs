@@ -1,6 +1,7 @@
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Entities;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.Customer;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgendamentosAPI.Adapters.Infrastructure.Repositories;

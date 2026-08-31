@@ -1,7 +1,6 @@
-using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 
-namespace AgendamentosAPI.Dtos;
+namespace AgendamentosAPI.Dtos.Customer;
 
 public record CustomerInputDto(
     [Required(ErrorMessage = "O nome é obrigatório.")]

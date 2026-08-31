@@ -1,6 +1,7 @@
-using AgendamentosAPI.Adapters.Infrastructure.Repositories.Ports;
 using AgendamentosAPI.Domain.Exceptions;
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.ServiceProvider;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;
 
 namespace AgendamentosAPI.Domain.Services;
@@ -13,7 +14,10 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
     {
         var provider = new ServiceProvider(
             input.Name,
-            input.Email
+            input.Email,
+            input.WorkStartTime,
+            input.WorkEndTime,
+            input.CalendarId
         );
         
         await repository.AddServiceProviderAsync(provider);
@@ -37,7 +41,7 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
 
-        provider.UpdateDetails(input.Name, input.Email); 
+        provider.UpdateDetails(input.Name, input.Email, input.WorkStartTime, input.WorkEndTime); 
         
         await repository.UpdateServiceProviderAsync(provider);
 
@@ -71,6 +75,9 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
             provider.Id, 
             provider.Name, 
             provider.Email, 
+            provider.WorkStartTime,
+            provider.WorkEndTime,
+            provider.IsOvernightShift,
             provider.IsActive
         );
     }

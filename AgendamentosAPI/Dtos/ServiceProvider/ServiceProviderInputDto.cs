@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace AgendamentosAPI.Dtos;
+namespace AgendamentosAPI.Dtos.ServiceProvider;
 
 public record ServiceProviderInputDto(
     [Required(ErrorMessage = "O nome é obrigatório.")]
@@ -9,5 +9,10 @@ public record ServiceProviderInputDto(
 
     [Required(ErrorMessage = "O e-mail é obrigatório.")]
     [EmailAddress(ErrorMessage = "O formato do e-mail é inválido.")]
-    string Email
+    string Email,
+    
+    string? CalendarId,
+    
+    TimeOnly WorkStartTime,
+    TimeOnly WorkEndTime
     );

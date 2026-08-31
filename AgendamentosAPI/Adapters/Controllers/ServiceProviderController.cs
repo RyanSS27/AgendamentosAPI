@@ -1,5 +1,7 @@
+using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Domain.Services;
 using AgendamentosAPI.Dtos;
+using AgendamentosAPI.Dtos.ServiceProvider;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgendamentosAPI.Adapters.Controllers;
