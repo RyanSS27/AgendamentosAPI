@@ -9,17 +9,21 @@ public class Appointment
     public Guid ProviderId { get; private set; }
     public Guid CustomerId { get; private set; }
     
-    // Id para integração externa do Google Calendar
-    public string? ExternalCalendarId { get; private set; } 
+    public string? ExternalEventId { get; private set; } 
     
-    public DateTime Start { get; private set; }
-    public DateTime End { get; private set; }
-    public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
+    public DateTimeOffset Start { get; private set; }
+    public DateTimeOffset End { get; private set; }
+    public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
     
     public AppointmentStatus Status { get; private set; } 
     public string? Observations { get; private set; } 
-
-    public Appointment(Guid providerId, Guid customerId, DateTime start, DateTime end, string? observations = null)
+    
+    public Appointment(
+        Guid providerId,
+        Guid customerId,
+        DateTimeOffset start, DateTimeOffset end,
+        string? observations = null, 
+        AppointmentStatus status = AppointmentStatus.Scheduled)
     {
         if (providerId == Guid.Empty)
             throw new DomainException("O prestador de serviço é obrigatório.");
@@ -27,37 +31,28 @@ public class Appointment
         if (customerId == Guid.Empty)
             throw new DomainException("O cliente é obrigatório.");
 
-        ValidateDates(start, end);
+        ValidateDatesAndStatus(start, end, status);
 
         ProviderId = providerId;
         CustomerId = customerId;
         Start = start;
         End = end;
         Observations = observations;
-        Status = AppointmentStatus.Scheduled; // Todo agendamento nasce como 'Agendado'
+        Status = status; 
     }
 
-    protected Appointment() {} // Necessário para o EF Core
+    protected Appointment() {}
 
-    private static void ValidateDates(DateTime start, DateTime end)
+    private static void ValidateDatesAndStatus(DateTimeOffset start, DateTimeOffset end , AppointmentStatus status)
     {
-        // Garante que não é possível criar um agendamento no passado
-        if (start < DateTime.UtcNow)
-            throw new DomainException("A data de início não pode estar no passado.");
-
         if (end <= start)
             throw new DomainException("O horário de término deve ser posterior ao horário de início.");
-    }
 
-    public void Reschedule(DateTime newStart, DateTime newEnd)
-    {
-        if (Status == AppointmentStatus.Canceled)
-            throw new DomainException("Não é possível remarcar um agendamento cancelado.");
+        bool isPast = start < DateTimeOffset.UtcNow;
 
-        ValidateDates(newStart, newEnd);
-
-        Start = newStart;
-        End = newEnd;
+        // Se for registrada uma consulta que ocorreu no passado, ela deve constar como Agendada/Cancelado 
+        if (isPast && status == AppointmentStatus.Scheduled)
+            throw new DomainException("Agendamentos retroativos só podem ser registrados como Concluídos ou Cancelados.");
     }
 
     public void Cancel()
@@ -76,11 +71,11 @@ public class Appointment
         Status = AppointmentStatus.Completed;
     }
 
-    public void LinkExternalCalendar(string externalId)
+    public void LinkExternalEvent(string externalId)
     {
         if (string.IsNullOrWhiteSpace(externalId))
-            throw new DomainException("O ID do calendário externo não pode ser vazio.");
+            throw new DomainException("O ID do evento externo não pode ser vazio.");
             
-        ExternalCalendarId = externalId;
+        ExternalEventId = externalId;
     }
 }

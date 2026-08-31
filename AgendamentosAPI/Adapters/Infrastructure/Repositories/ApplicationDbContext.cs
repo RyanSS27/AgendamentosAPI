@@ -11,7 +11,7 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     
     public DbSet<Customer> Customers { get; set; }
     public DbSet<ServiceProvider> ServiceProviders { get; set; }
-    
+    public DbSet<Appointment> Appointments { get; set; }
     
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

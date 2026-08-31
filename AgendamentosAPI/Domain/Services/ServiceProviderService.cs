@@ -75,6 +75,9 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
             provider.Id, 
             provider.Name, 
             provider.Email, 
+            provider.WorkStartTime,
+            provider.WorkEndTime,
+            provider.IsOvernightShift,
             provider.IsActive
         );
     }
