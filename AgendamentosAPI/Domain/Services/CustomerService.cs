@@ -2,6 +2,7 @@ using AgendamentosAPI.Adapters.Infrastructure.Repositories;
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Dtos;
 using AgendamentosAPI.Dtos.Customer;
 

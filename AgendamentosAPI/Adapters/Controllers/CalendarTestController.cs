@@ -1,5 +1,6 @@
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgendamentosAPI.Adapters.Controllers;
@@ -9,11 +10,11 @@ namespace AgendamentosAPI.Adapters.Controllers;
 [Route("api/[controller]")]
 public class CalendarTestController : ControllerBase
 {
-    private readonly ICalendarIntegrationPort _calendarPort;
+    private readonly ICalendarIntegrationService _calendar;
 
-    public CalendarTestController(ICalendarIntegrationPort calendarPort)
+    public CalendarTestController(ICalendarIntegrationService calendar)
     {
-        _calendarPort = calendarPort;
+        _calendar = calendar;
     }
 
     [HttpGet("busy-periods")]
@@ -25,7 +26,7 @@ public class CalendarTestController : ControllerBase
 
         try
         {
-            var busyPeriods = await _calendarPort.GetBusyPeriodsAsync(calendarId, start, end);
+            var busyPeriods = await _calendar.GetBusyPeriodsAsync(calendarId, start, end);
             
             return Ok(new 
             { 
@@ -53,7 +54,7 @@ public class CalendarTestController : ControllerBase
 
         try
         {
-            var eventId = await _calendarPort.CreateEventAsync(calendarId, dummyAppointment);
+            var eventId = await _calendar.CreateEventAsync(calendarId, dummyAppointment);
             return Ok(new { Mensagem = "Criado com sucesso", ExternalEventId = eventId });
         }
         catch (Exception ex)
@@ -76,7 +77,7 @@ public class CalendarTestController : ControllerBase
 
         try
         {
-            await _calendarPort.UpdateEventAsync(calendarId, dummyAppointment);
+            await _calendar.UpdateEventAsync(calendarId, dummyAppointment);
             return Ok(new { Mensagem = "Atualizado com sucesso" });
         }
         catch (Exception ex)
@@ -90,7 +91,7 @@ public class CalendarTestController : ControllerBase
     {
         try
         {
-            await _calendarPort.CancelEventAsync(calendarId, eventId);
+            await _calendar.CancelEventAsync(calendarId, eventId);
             return Ok(new { Mensagem = "Deletado com sucesso" });
         }
         catch (Exception ex)
