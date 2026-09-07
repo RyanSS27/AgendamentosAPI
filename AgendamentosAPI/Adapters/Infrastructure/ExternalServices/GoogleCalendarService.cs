@@ -1,16 +1,17 @@
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using Flurl.Http;
 
 namespace AgendamentosAPI.Adapters.Infrastructure.ExternalServices;
 
-public class GoogleCalendarAdapter : ICalendarIntegrationPort
+public class GoogleCalendarService : ICalendarIntegrationService
 {
     private const string BaseUrl = "https://www.googleapis.com/calendar/v3";
     private readonly IGoogleTokenProvider _tokenProvider;
 
     // Injetamos um provedor de token para isolar a complexidade de gerar o JWT da Service Account
-    public GoogleCalendarAdapter(IGoogleTokenProvider tokenProvider)
+    public GoogleCalendarService(IGoogleTokenProvider tokenProvider)
     {
         _tokenProvider = tokenProvider;
     }

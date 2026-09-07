@@ -1,6 +1,6 @@
 using AgendamentosAPI.Dtos.Customer;
 
-namespace AgendamentosAPI.Domain.Services;
+namespace AgendamentosAPI.Domain.Ports.ServicePorts;
 
 public interface ICustomerService
 {

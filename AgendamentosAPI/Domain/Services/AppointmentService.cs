@@ -1,5 +1,6 @@
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Dtos.Appointment;
 
 namespace AgendamentosAPI.Domain.Services;

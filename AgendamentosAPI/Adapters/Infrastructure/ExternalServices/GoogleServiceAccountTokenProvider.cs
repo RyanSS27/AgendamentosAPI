@@ -1,4 +1,5 @@
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using Google.Apis.Auth.OAuth2;
 
 namespace AgendamentosAPI.Adapters.Infrastructure.ExternalServices;

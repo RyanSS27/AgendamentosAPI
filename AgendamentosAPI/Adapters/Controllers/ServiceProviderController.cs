@@ -1,4 +1,5 @@
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Domain.Services;
 using AgendamentosAPI.Dtos;
 using AgendamentosAPI.Dtos.ServiceProvider;

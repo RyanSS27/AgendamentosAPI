@@ -13,7 +13,7 @@ public class ServiceProvider
     public TimeOnly WorkStartTime { get; private set; }
     public TimeOnly WorkEndTime { get; private set; }
 
-    public bool IsOvernightShift => WorkEndTime > WorkStartTime;
+    public bool IsOvernightShift => WorkEndTime < WorkStartTime; // essa regra não serve
     public bool IsActive { get; private set; } = true;
 
     public ServiceProvider(

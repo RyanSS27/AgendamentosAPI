@@ -1,5 +1,6 @@
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Dtos;
 using AgendamentosAPI.Dtos.ServiceProvider;
 using ServiceProvider = AgendamentosAPI.Domain.Entities.ServiceProvider;

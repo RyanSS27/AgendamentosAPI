@@ -1,12 +1,9 @@
 using AgendamentosAPI.Domain.Entities;
-using AgendamentosAPI.Dtos;
-using AgendamentosAPI.Dtos.Appointment;
-using Google.Apis.Calendar.v3.Data;
 
-namespace AgendamentosAPI.Domain.Ports;
+namespace AgendamentosAPI.Domain.Ports.ServicePorts;
 
 // Porta de comunicação com o serviço da API externa
-public interface ICalendarIntegrationPort
+public interface ICalendarIntegrationService
 {
     Task<IReadOnlyCollection<TimePeriod>> GetBusyPeriodsAsync(string calendarId, DateTimeOffset start, DateTimeOffset end);
     Task<string> CreateEventAsync(string calendarId, Appointment appointment);

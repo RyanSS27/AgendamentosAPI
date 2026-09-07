@@ -1,4 +1,4 @@
-namespace AgendamentosAPI.Domain.Ports;
+namespace AgendamentosAPI.Domain.Ports.ServicePorts;
 
 public interface IGoogleTokenProvider
 {
