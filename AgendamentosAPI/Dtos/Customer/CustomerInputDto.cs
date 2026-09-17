@@ -8,7 +8,7 @@ public record CustomerInputDto(
     string Name,
 
     [Required(ErrorMessage = "O CPF é obrigatório.")]
-    [RegularExpression(@"^\d{9}-\d{2}$", ErrorMessage = "O CPF deve seguir o formato xxxxxxxxx-xx.")]
+    [RegularExpression(@"^\d{11}$|^\d{3}\.\d{3}\.\d{3}-\d{2}$", ErrorMessage = "O CPF deve conter 11 dígitos numéricos ou o formato 000.000.000-00.")]
     string Cpf,
 
     [Required(ErrorMessage = "A lista de telefones é obrigatória.")]

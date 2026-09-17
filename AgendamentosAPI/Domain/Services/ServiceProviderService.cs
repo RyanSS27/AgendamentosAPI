@@ -9,12 +9,13 @@ namespace AgendamentosAPI.Domain.Services;
 
 public class ServiceProviderService(IServiceProviderRepository repository) : IServiceProviderService
 {
-    public readonly int LimitPerRequest = 25;
+    private readonly int _limitPerRequest = 25;
     
     public async Task<ServiceProviderOutDto> AddServiceProviderAsync(ServiceProviderInputDto input)
     {
         var provider = new ServiceProvider(
             input.Name,
+            input.Cpf,
             input.Email,
             input.WorkStartTime,
             input.WorkEndTime,
@@ -42,7 +43,7 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
         if (provider is null)
             throw new NotFoundException($"Prestador de serviço de id '{id}' não encontrado.");
 
-        provider.UpdateDetails(input.Name, input.Email, input.WorkStartTime, input.WorkEndTime); 
+        provider.UpdateDetails(input.Name, input.Cpf, input.Email, input.CalendarId, input.WorkStartTime, input.WorkEndTime); 
         
         await repository.UpdateServiceProviderAsync(provider);
 
@@ -55,7 +56,7 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
             return [];
 
         if (limit > 25)
-            limit = LimitPerRequest;
+            limit = _limitPerRequest;
 
         return await repository.ListServiceProvidersAsync(limit.Value);
     }
@@ -75,7 +76,9 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
         return new ServiceProviderOutDto(
             provider.Id, 
             provider.Name, 
+            provider.Cpf,
             provider.Email, 
+            provider.CalendarId,
             provider.WorkStartTime,
             provider.WorkEndTime,
             provider.IsOvernightShift,

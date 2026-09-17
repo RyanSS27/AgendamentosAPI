@@ -21,7 +21,6 @@ public class CustomerService(ICustomerRepository repository) : ICustomerService
         await repository.AddCustomerAsync(customer);
         return MapToOutDto(customer);
     }
-    // 37129607-411b-4177-8893-d7f27193ff3d
 
     public async Task<CustomerOutDto> GetCustomerByIdAsync(Guid id)
     {
