@@ -9,7 +9,7 @@ namespace AgendamentosAPI.Domain.Services;
 
 public class ServiceProviderService(IServiceProviderRepository repository) : IServiceProviderService
 {
-    public readonly int LimitPerRequest = 25;
+    private readonly int _limitPerRequest = 25;
     
     public async Task<ServiceProviderOutDto> AddServiceProviderAsync(ServiceProviderInputDto input)
     {
@@ -56,7 +56,7 @@ public class ServiceProviderService(IServiceProviderRepository repository) : ISe
             return [];
 
         if (limit > 25)
-            limit = LimitPerRequest;
+            limit = _limitPerRequest;
 
         return await repository.ListServiceProvidersAsync(limit.Value);
     }

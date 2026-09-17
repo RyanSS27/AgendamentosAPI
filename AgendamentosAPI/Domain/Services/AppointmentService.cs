@@ -36,7 +36,6 @@ public class AppointmentService(
             throw new DomainException(
                 "A duração da consulta deve ser de no mínimo 10 minutos e no máximo 90 minutos (1:30)");
         
-        // A duração deve ser obrigatoriamente um múltiplo de 5 minutos para alinhamento da grade de horários
         if (duration.TotalMinutes % 5 != 0)
             throw new DomainException("A duração solicitada deve ser um múltiplo de 5 minutos.");
 
@@ -47,7 +46,6 @@ public class AppointmentService(
         if (provider.CalendarId is null)
             throw new DomainException("O Id do Calendário do prestador ainda não foi cadastrado.");
         
-        // Se, por acaso o número de dias para a pesquisa exceder a variável de controle, considere o período máximo de busca
         if (endDate.DayNumber - startDate.DayNumber > MaxSearchPeriodDays)
         {
             endDate = startDate.AddDays(MaxSearchPeriodDays);
@@ -57,7 +55,7 @@ public class AppointmentService(
             provider.CalendarId, 
             new DateTimeOffset(startDate.ToDateTime(TimeOnly.MinValue), TimeSpan.Zero), 
             provider.IsOvernightShift ? 
-                    // Caso o turno seja noturno, a data de fim do limite recebe +1 dia para cobrir o último turno
+                    // Caso o turno seja noturno, a data de fim do limite recebe +1 dia para cobrir o último turno até o fim
                     new DateTimeOffset(endDate.AddDays(1).ToDateTime(TimeOnly.MaxValue), TimeSpan.Zero)
                     : new DateTimeOffset(endDate.ToDateTime(provider.WorkEndTime), TimeSpan.Zero)); 
         
