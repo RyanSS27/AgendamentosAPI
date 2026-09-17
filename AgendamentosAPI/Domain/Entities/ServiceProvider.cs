@@ -5,19 +5,22 @@ namespace AgendamentosAPI.Domain.Entities;
 
 public class ServiceProvider
 {
-    public Guid Id  { get; private set; } = Guid.NewGuid();
+    public Guid Id { get; private set; } = Guid.NewGuid();
     public string Name { get; private set; }
+    public string Cpf { get; private set; }
     public string? Email { get; private set; }
     public string? CalendarId { get; private set; }
     
     public TimeOnly WorkStartTime { get; private set; }
     public TimeOnly WorkEndTime { get; private set; }
+    
+    public bool IsOvernightShift => WorkEndTime < WorkStartTime;
 
-    public bool IsOvernightShift => WorkEndTime < WorkStartTime; // essa regra não serve
     public bool IsActive { get; private set; } = true;
 
     public ServiceProvider(
         string name, 
+        string cpf,
         string? email, 
         TimeOnly workStartTime, 
         TimeOnly workEndTime, 
@@ -25,7 +28,8 @@ public class ServiceProvider
     {
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("É necessário informar o nome do prestador.");
-
+        
+        Cpf = ValidateCpf(cpf);
         ValidateWorkSchedule(workStartTime, workEndTime);
 
         Name = name;
@@ -35,7 +39,22 @@ public class ServiceProvider
         CalendarId = calendarId;
     }
 
-    private void ValidateWorkSchedule(TimeOnly workStartTime, TimeOnly workEndTime)
+    protected ServiceProvider() {}
+    
+    private static string ValidateCpf(string cpf)
+    {
+        if (string.IsNullOrWhiteSpace(cpf))
+            throw new DomainException("O CPF é obrigatório.");
+
+        var cleanCpf = Regex.Replace(cpf, @"\D", "");
+        
+        if (cleanCpf.Length != 11)
+            throw new DomainException("O CPF deve seguir o formato de 11 dígitos numéricos.");
+
+        return cleanCpf;
+    }
+
+    private static void ValidateWorkSchedule(TimeOnly workStartTime, TimeOnly workEndTime)
     {
         if (workStartTime == workEndTime)
             throw new DomainException("O horário de inicio e termino de expediente não podem ser iguais.");
@@ -61,6 +80,8 @@ public class ServiceProvider
     {
         if (string.IsNullOrWhiteSpace(calendarId))
             throw new DomainException("O novo Id da agenda não pode ser vazio.");
+
+        CalendarId = calendarId;
     }
 
     public void InactiveAccount()
@@ -73,10 +94,16 @@ public class ServiceProvider
         IsActive = true;
     }
 
-    public void UpdateDetails(string inputName, string inputEmail, TimeOnly newStart, TimeOnly newEnd)
+    public void UpdateDetails(string name, string cpf, string email, string? calendarId, TimeOnly newStart, TimeOnly newEnd)
     {
-        ChangeName(inputName);
-        ChangeEmail(inputEmail);
+        ChangeName(name);
+        
+        if (Cpf != cpf)
+            CorrectCpf(cpf);
+
+        CalendarId = calendarId;
+        
+        ChangeEmail(email);
         UpdateWorkSchedule(newStart, newEnd);
     }
 
@@ -85,5 +112,10 @@ public class ServiceProvider
         ValidateWorkSchedule(newStart, newEnd);
         WorkStartTime = newStart;
         WorkEndTime = newEnd;
+    }
+    
+    public void CorrectCpf(string correctCpf)
+    {
+        Cpf = ValidateCpf(correctCpf);
     }
 }

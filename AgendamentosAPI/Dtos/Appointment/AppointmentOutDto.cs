@@ -12,6 +12,7 @@ public record AppointmentOutDto(
     DateTimeOffset End,
     DateTimeOffset CreatedAt, 
         
+    string AppointmentTitle,
     AppointmentStatus Status, 
     string? Observations  
     );

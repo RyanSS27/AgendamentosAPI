@@ -8,13 +8,13 @@ public class Appointment
     public Guid Id { get; private set; } = Guid.NewGuid();
     public Guid ProviderId { get; private set; }
     public Guid CustomerId { get; private set; }
-    
     public string? ExternalEventId { get; private set; } 
     
     public DateTimeOffset Start { get; private set; }
     public DateTimeOffset End { get; private set; }
     public DateTimeOffset CreatedAt { get; private set; } = DateTimeOffset.UtcNow;
     
+    public string AppointmentTitle { get; private set; }
     public AppointmentStatus Status { get; private set; } 
     public string? Observations { get; private set; } 
     
@@ -22,6 +22,7 @@ public class Appointment
         Guid providerId,
         Guid customerId,
         DateTimeOffset start, DateTimeOffset end,
+        string appointmentTitle,
         string? observations = null, 
         AppointmentStatus status = AppointmentStatus.Scheduled)
     {
@@ -31,8 +32,11 @@ public class Appointment
         if (customerId == Guid.Empty)
             throw new DomainException("O cliente é obrigatório.");
 
-        ValidateDatesAndStatus(start, end, status);
+        if (string.IsNullOrEmpty(appointmentTitle))
+            throw new DomainException("O título do agendamento é obrigatório.");
 
+        ValidateDatesAndStatus(start, end, status);
+        AppointmentTitle = appointmentTitle;
         ProviderId = providerId;
         CustomerId = customerId;
         Start = start;

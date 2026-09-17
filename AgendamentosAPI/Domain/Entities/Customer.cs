@@ -21,20 +21,18 @@ public class Customer
         if (string.IsNullOrWhiteSpace(name))
             throw new DomainException("É necessário informar o nome do cliente.");
         
-        ValidateCpf(cpf);
+        var cleanCpf = ValidateCpf(cpf);
         
         if (phoneNumbers is null || !phoneNumbers.Any())
             throw new DomainException("O cliente deve ter no mínimo 1 número de contato.");
         
-        var uniquePhones = phoneNumbers.Distinct().ToList();
-
-        foreach (var phone in uniquePhones)
-        {
-            ValidatePhoneNumber(phone);
-        }
+        var uniquePhones = phoneNumbers
+            .Select(ValidatePhoneNumber)
+            .Distinct()
+            .ToList();
 
         Name = name;
-        Cpf = cpf;
+        Cpf = cleanCpf;
         _phoneNumbers = uniquePhones;
     }
     
@@ -44,17 +42,17 @@ public class Customer
     {
         ChangeName(name);
 
-        if (Cpf != cpf)
+        var cleanCpf = ValidateCpf(cpf);
+        if (Cpf != cleanCpf)
             CorrectCpf(cpf);
 
         if (phoneNumbers is null || !phoneNumbers.Any())
             throw new DomainException("O cliente deve ter no mínimo 1 número de contato.");
 
-        var uniquePhones = phoneNumbers.Distinct().ToList();
-        
-        foreach (var phone in uniquePhones)
-            ValidatePhoneNumber(phone);
-        
+        var uniquePhones = phoneNumbers
+            .Select(ValidatePhoneNumber)
+            .Distinct()
+            .ToList();
         
         _phoneNumbers.Clear();
         _phoneNumbers.AddRange(uniquePhones);
@@ -70,10 +68,10 @@ public class Customer
 
     public void AddPhoneNumber(string phoneNumber)
     {
-        ValidatePhoneNumber(phoneNumber);
+        var cleanPhone = ValidatePhoneNumber(phoneNumber);
         
-        if (!_phoneNumbers.Contains(phoneNumber))
-            _phoneNumbers.Add(phoneNumber);
+        if (!_phoneNumbers.Contains(cleanPhone))
+            _phoneNumbers.Add(cleanPhone);
     }
 
     public void RemovePhoneNumber(string phoneNumber)
@@ -84,11 +82,12 @@ public class Customer
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new DomainException("O número de telefone deve ser válido para remoção.");
 
-        if (!_phoneNumbers.Contains(phoneNumber))
+        var cleanPhone = Regex.Replace(phoneNumber, @"\D", "");
+
+        if (!_phoneNumbers.Contains(cleanPhone))
             throw new DomainException("Este número não pertence ao cliente.");
 
-
-        _phoneNumbers.Remove(phoneNumber);
+        _phoneNumbers.Remove(cleanPhone);
     }
     
     public void ChangePhoneNumber(string oldNumber, string newNumber)
@@ -96,16 +95,17 @@ public class Customer
         if (string.IsNullOrWhiteSpace(oldNumber) || string.IsNullOrWhiteSpace(newNumber))
             throw new DomainException("Tanto o número antigo quanto o novo devem ser informados.");
 
-        if (!_phoneNumbers.Contains(oldNumber))
+        var cleanOld = Regex.Replace(oldNumber, @"\D", "");
+        var cleanNew = ValidatePhoneNumber(newNumber);
+
+        if (!_phoneNumbers.Contains(cleanOld))
             throw new DomainException("O número antigo não pertence a este cliente.");
 
-        ValidatePhoneNumber(newNumber);
-
-        if (_phoneNumbers.Contains(newNumber))
+        if (_phoneNumbers.Contains(cleanNew))
             throw new DomainException("O novo número já está cadastrado para este cliente.");
         
-        _phoneNumbers.Remove(oldNumber);
-        _phoneNumbers.Add(newNumber);
+        _phoneNumbers.Remove(cleanOld);
+        _phoneNumbers.Add(cleanNew);
     }
     
     public void InactiveAccount()
@@ -118,34 +118,34 @@ public class Customer
         IsActive = true;
     }
 
-    private static void ValidateCpf(string cpf)
+    private static string ValidateCpf(string cpf)
     {
         if (string.IsNullOrWhiteSpace(cpf))
             throw new DomainException("O CPF é obrigatório.");
 
-        // Padrão: 9 números, um hífen e 2 números (xxxxxxxxx-xx).
-        var cpfRegex = new Regex(@"^\d{9}-\d{2}$");
+        var cleanCpf = Regex.Replace(cpf, @"\D", "");
         
-        if (!cpfRegex.IsMatch(cpf))
-            throw new DomainException("O CPF deve seguir o formato: 9 números, um hífen e 2 números (xxxxxxxxx-xx).");
+        if (cleanCpf.Length != 11)
+            throw new DomainException("O CPF deve seguir o formato de 11 dígitos numéricos.");
+
+        return cleanCpf;
     }
 
-    private static void ValidatePhoneNumber(string phoneNumber)
+    private static string ValidatePhoneNumber(string phoneNumber)
     {
         if (string.IsNullOrWhiteSpace(phoneNumber))
             throw new DomainException("O número de telefone não pode ser vazio.");
             
-        // Remove caracteres não numéricos comuns para validar se a string tem uma quantidade aceitável de dígitos (ex: 10 ou 11 números no padrão BR).
-        var cleanPhone = phoneNumber.Replace("-", "").Replace(" ", "").Replace("(", "").Replace(")", "");
-        var phoneRegex = new Regex(@"^\d{10,11}$");
+        var cleanPhone = Regex.Replace(phoneNumber, @"\D", "");
         
-        if (!phoneRegex.IsMatch(cleanPhone))
+        if (cleanPhone.Length < 10 || cleanPhone.Length > 11)
              throw new DomainException("O formato do telefone é inválido (deve conter o DDD e o número).");
+
+        return cleanPhone;
     }
     
     public void CorrectCpf(string correctCpf)
     {
-        ValidateCpf(correctCpf);
-        Cpf = correctCpf;
+        Cpf = ValidateCpf(correctCpf);
     }
 }
