@@ -3,18 +3,23 @@ using System.Runtime.CompilerServices;
 using AgendamentosAPI.Domain.Entities;
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.RepositoryPorts;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Dtos.Appointment;
+using AgendamentosAPI.Dtos.Appointment.Filters;
 
 namespace AgendamentosAPI.Domain.Services;
 
 public class AppointmentService(
     IServiceProviderRepository providerRepository,
     ICustomerRepository customerRepository,
+    IAppointmentRepository appointmentRepository,
     ICalendarIntegrationService calendarService) : IAppointmentService
 {
     private const int MaxSearchPeriodDays = 35;
     private const int MaxAppointmentDurationMinutes = 90;
+    private const int MaxPageSize = 25;
+    private const int DefaultPageSize = 15;
     public Task<IReadOnlyCollection<TimePeriod>> GetBusyPeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end)
     {
         throw new NotImplementedException();
@@ -131,6 +136,36 @@ public class AppointmentService(
     }
 
     public Task<AppointmentOutDto> CancelEventAsync(string calendarId, string externalEventId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public async Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter)
+    {
+        var page = filter.Page < 1 ? 1 : filter.Page;
+        var pageSize = filter.PageSize > MaxPageSize 
+            ? MaxPageSize 
+            : (filter.PageSize < 1 ? DefaultPageSize : filter.PageSize);
+        if (filter.PageSize > MaxPageSize)
+        {
+            pageSize = MaxPageSize;
+        }
+        else if (filter.PageSize < 1 )
+        {
+            pageSize = DefaultPageSize;
+        }
+        else
+        {
+            pageSize = filter.PageSize;
+        }
+            
+        // 2. Cria um novo record higienizado copiando os demais valores (non-destructive mutation)
+        var safeFilter = filter with { Page = page, PageSize = pageSize };
+        
+        return await appointmentRepository.SearchAppointmentsAsync(safeFilter);
+    }
+
+    public async Task DeleteAppointmentAsync(Guid appointmentId)
     {
         throw new NotImplementedException();
     }

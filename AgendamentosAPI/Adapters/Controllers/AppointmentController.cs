@@ -1,4 +1,6 @@
+using AgendamentosAPI.Adapters.Controllers.Requests;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
+using AgendamentosAPI.Dtos.Appointment.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgendamentosAPI.Adapters.Controllers;
@@ -12,4 +14,20 @@ public class AppointmentController(IAppointmentService appointmentService) : Con
     {
         return Ok(await appointmentService.GetFreePeriodsSlotsAsync(providerId, start, end, duration));
     }
+
+    [HttpGet]
+    public async Task<IActionResult> Search([FromQuery] SearchAppointmentsRequest request)
+    {
+        var filter = new AppointmentFilter(
+            ProviderId: request.ProviderId,
+            CustomerId: request.CustomerId,
+            Status: request.Status,
+            PeriodStart: request.PeriodStart,
+            PeriodEnd: request.PeriodEnd,
+            Page: request.Page,
+            PageSize: request.PageSize
+        );
+
+        return Ok(await appointmentService.SearchAppointmentAsync(filter));
+    } 
 }
