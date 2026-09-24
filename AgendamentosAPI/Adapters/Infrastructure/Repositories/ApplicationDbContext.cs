@@ -16,6 +16,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
+        
+        // Enums de appointment salvos como string
+        modelBuilder.Entity<Appointment>()
+            .Property(a => a.Status)
+            .HasConversion<string>();
     
         // Varre o assembly atual e aplica todas as classes que implementam IEntityTypeConfiguration
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(ApplicationDbContext).Assembly);
