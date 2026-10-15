@@ -1,7 +1,8 @@
 using AgendamentosAPI.Domain.Entities;
+using AgendamentosAPI.Domain.Entities.Enums;
 using AgendamentosAPI.Domain.Ports.RepositoryPorts;
-using AgendamentosAPI.Dtos.Appointment;
-using AgendamentosAPI.Dtos.Appointment.Filters;
+using AgendamentosAPI.Dtos.Appointments;
+using AgendamentosAPI.Dtos.Appointments.Filters;
 using Microsoft.EntityFrameworkCore;
 
 namespace AgendamentosAPI.Adapters.Infrastructure.Repositories;
@@ -63,6 +64,16 @@ public class AppointmentRepository(ApplicationDbContext context) : IAppointmentR
 
         // Aqui ela é traduzida para SQL e executada, com o ToListAsync()
         return new PagedResult<Appointment>(items, totalCount, filter.Page, filter.PageSize);
+    }
+    
+    public async Task<bool> HasConflictAsync(Guid providerId, DateTimeOffset start, DateTimeOffset end)
+    {
+        return await context.Appointments
+            .AnyAsync(a => 
+                a.ProviderId == providerId &&
+                a.Status == AppointmentStatus.Scheduled && 
+                a.Start < end && 
+                a.End > start);
     }
 
     public async Task DeleteAppointmentAsync(Appointment appointment)

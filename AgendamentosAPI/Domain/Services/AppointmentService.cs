@@ -1,12 +1,11 @@
-using System.Data;
-using System.Runtime.CompilerServices;
 using AgendamentosAPI.Domain.Entities;
+using AgendamentosAPI.Domain.Entities.Enums;
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Domain.Ports.RepositoryPorts;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
-using AgendamentosAPI.Dtos.Appointment;
-using AgendamentosAPI.Dtos.Appointment.Filters;
+using AgendamentosAPI.Dtos.Appointments;
+using AgendamentosAPI.Dtos.Appointments.Filters;
 
 namespace AgendamentosAPI.Domain.Services;
 

@@ -1,6 +1,6 @@
 using AgendamentosAPI.Domain.Entities.Enums;
 
-namespace AgendamentosAPI.Dtos.Appointment.Filters;
+namespace AgendamentosAPI.Dtos.Appointments.Filters;
 
 public record AppointmentFilter(
     Guid? ProviderId = null,

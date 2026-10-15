@@ -1,4 +1,4 @@
-namespace AgendamentosAPI.Dtos.Appointment;
+namespace AgendamentosAPI.Dtos.Appointments;
 
 public record PagedResult<T>(
     IEnumerable<T> Items,

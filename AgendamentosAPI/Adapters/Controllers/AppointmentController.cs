@@ -1,6 +1,6 @@
 using AgendamentosAPI.Adapters.Controllers.Requests;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
-using AgendamentosAPI.Dtos.Appointment.Filters;
+using AgendamentosAPI.Dtos.Appointments.Filters;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AgendamentosAPI.Adapters.Controllers;
