@@ -10,7 +10,7 @@ public interface IAppointmentRepository
     Task UpdateAppointmentAsync(Appointment appointment);
     Task<Appointment?> GetAppointmentByIdAsync(Guid id);
     Task<PagedResult<Appointment>> SearchAppointmentsAsync(AppointmentFilter filter);
-    
+    Task<bool> HasConflictAsync(Guid providerId, DateTimeOffset start, DateTimeOffset end);
 
     Task DeleteAppointmentAsync(Appointment appointment);
 }

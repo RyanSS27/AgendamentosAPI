@@ -1,5 +1,4 @@
 using AgendamentosAPI.Domain.Entities;
-using AgendamentosAPI.Domain.Ports;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,8 +20,8 @@ public class CalendarTestController : ControllerBase
     public async Task<IActionResult> GetBusyPeriods([FromQuery] string calendarId)
     {
         // Definimos uma janela de tempo de 7 dias a partir de agora para o teste
-        var start = DateTimeOffset.UtcNow;
-        var end = start.AddDays(7);
+        var start = DateTimeOffset.Parse("2026-10-16T12:00:00+00:00");
+        var end = DateTimeOffset.Parse("2026-10-16T15:59:59+00:00");
 
         try
         {

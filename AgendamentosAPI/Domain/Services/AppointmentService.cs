@@ -45,7 +45,7 @@ public class AppointmentService(
 
         var provider = await providerRepository.GetServiceProviderByIdAsync(providerId);
         if (provider is null)
-            throw new NotFoundException("Prestador de serviço não encontrado para o id '" + providerId + "'.");
+            throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{providerId}'.");
 
         if (provider.CalendarId is null)
             throw new DomainException("O Id do Calendário do prestador ainda não foi cadastrado.");
@@ -124,10 +124,59 @@ public class AppointmentService(
         return new FreeSlotsResponse(responseDays.AsReadOnly());
     }
 
-    public Task<AppointmentOutDto> CreateEventAsync(string calendarId, Appointment appointment)
+    public async Task<AppointmentOutDto> CreateEventAsync(string calendarId, AppointmentInputDto appointmentInput)
     {
-        throw new NotImplementedException();
+        var customer = await customerRepository.GetCustomerByIdAsync(appointmentInput.CustomerId);
+        if (customer is null)
+            throw new NotFoundException($"Não há um cliente registrado com Id '{appointmentInput.CustomerId}'.");
+
+        var provider = await providerRepository.GetServiceProviderByIdAsync(appointmentInput.ProviderId);
+        if (provider is null)
+            throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointmentInput.ProviderId}'.");
+
+        if (string.IsNullOrWhiteSpace(provider.CalendarId))
+            throw new DomainException($"O prestador de serviço {provider.Name} ainda não contém agenda cadastrada.");
+        
+        var appointment = new Appointment(
+            appointmentInput.ProviderId,
+            appointmentInput.CustomerId,
+            appointmentInput.Start,
+            appointmentInput.End,
+            appointmentInput.Title,
+            appointmentInput.Status,
+            observations: appointmentInput.Observations
+        );
+        
+        switch (appointment.Status)
+        {
+            case AppointmentStatus.Scheduled:
+                var hasDbConflict = await appointmentRepository.HasConflictAsync(provider.Id, appointment.Start, appointment.End);
+                if (hasDbConflict)
+                    throw new DomainException("O período informado já possui um agendamento no sistema interno. Consulte os horários livres.");
+                
+                var ocupacoes = await calendarService.GetBusyPeriodsAsync(provider.CalendarId, appointment.Start, appointment.End);
+                if (ocupacoes.Any())
+                    throw new DomainException("O período informado está ocupado na agenda externa. Consulte os horários livres.");
+                
+                var externalId = await calendarService.CreateEventAsync(provider.CalendarId, appointment);
+                appointment.LinkExternalEvent(externalId);
+                break;
+
+            case AppointmentStatus.Completed:
+                var completedExternalId = await calendarService.CreateEventAsync(provider.CalendarId, appointment);
+                appointment.LinkExternalEvent(completedExternalId);
+                break;
+
+            case AppointmentStatus.Canceled:
+                break;
+        }
+        
+        await appointmentRepository.AddAppointmentAsync(appointment);
+        
+        
+        return AppointmentOutDto.FromEntity(appointment);
     }
+    
 
     public Task<AppointmentOutDto> UpdateEventAsync(string calendarId, Appointment appointment)
     {
