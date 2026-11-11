@@ -124,7 +124,7 @@ public class AppointmentService(
         return new FreeSlotsResponse(responseDays.AsReadOnly());
     }
 
-    public async Task<AppointmentOutDto> CreateEventAsync(string calendarId, AppointmentInputDto appointmentInput)
+    public async Task<AppointmentOutDto> CreateEventAsync(AppointmentInputDto appointmentInput)
     {
         var customer = await customerRepository.GetCustomerByIdAsync(appointmentInput.CustomerId);
         if (customer is null)
@@ -178,8 +178,11 @@ public class AppointmentService(
     }
     
 
-    public Task<AppointmentOutDto> UpdateEventAsync(string calendarId, Appointment appointment)
+    public async Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentInputDto appointmentInput)
     {
+        var appointment = await appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+        
+
         throw new NotImplementedException();
     }
 
