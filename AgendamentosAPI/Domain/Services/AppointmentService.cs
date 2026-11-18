@@ -218,7 +218,27 @@ public class AppointmentService(
 
     public async Task<AppointmentOutDto> CancelEventAsync(Guid appointmentId)
     {
-        throw new NotImplementedException();
+        var appointment = await appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+        if (appointment is null)
+            throw new NotFoundException($"Não foi possível encontrar o agendamento de Id '{appointmentId}'.");
+        
+        appointment.Cancel();
+        
+        if (!string.IsNullOrWhiteSpace(appointment.ExternalEventId))
+        {
+            var provider = await providerRepository.GetServiceProviderByIdAsync(appointment.ProviderId);
+            if (provider is null)
+                throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointment.ProviderId}'.");
+            
+            if (string.IsNullOrWhiteSpace(provider.CalendarId))
+                throw new DomainException("O calendar id do prestador não está consta para o atualizar o evento na agenda externa.");
+            
+            await calendarService.CancelEventAsync(provider.CalendarId, appointment.ExternalEventId);
+        }
+        
+        await appointmentRepository.UpdateAppointmentAsync(appointment);
+
+        return AppointmentOutDto.FromEntity(appointment);
     }
 
     public async Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter)
