@@ -21,7 +21,7 @@ public record AppointmentInputDto(
     [RegularExpression(@"^[a-zA-Z0-9\sÀ-ÿ,.\-'\(\)]+$", ErrorMessage = "Utilize apenas letras, números, espaços e pontuações comuns no título.")]
     string Title,
 
-    [EnumDataType(typeof(AppointmentStatus), ErrorMessage = "Selecione um status válido (ex: 0 para Agendado, 1 para Concluído, 2 para Cancelado).")]
+    [EnumDataType(typeof(AppointmentStatus), ErrorMessage = "Selecione um status válido (ex: 'Scheduled' (ou 0) para Agendado, Completed (ou 1) para Concluído, 'Canceled' (ou 2) para Cancelado).")]
     AppointmentStatus Status = AppointmentStatus.Scheduled,
 
     [StringLength(500, ErrorMessage = "O texto das observações excedeu o limite máximo de 500 caracteres. Por favor, resuma as informações.")]

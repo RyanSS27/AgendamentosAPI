@@ -150,9 +150,10 @@ public class AppointmentService(
         switch (appointment.Status)
         {
             case AppointmentStatus.Scheduled:
-                var hasDbConflict = await appointmentRepository.HasConflictAsync(provider.Id, appointment.Start, appointment.End);
+                // Melhorar esse fluxo retornando de quem é o compromisso que vem gerando conflito: do cliente ou provider
+                var hasDbConflict = await appointmentRepository.HasConflictAsync(provider.Id, customer.Id, appointment.Start, appointment.End);
                 if (hasDbConflict)
-                    throw new DomainException("O período informado já possui um agendamento no sistema interno. Consulte os horários livres.");
+                    throw new DomainException("O período informado já possui um agendamento no sistema interno. Consulte os horários livres do prestador e se o cliente já não possui agendamento neste horário.");
                 
                 var ocupacoes = await calendarService.GetBusyPeriodsAsync(provider.CalendarId, appointment.Start, appointment.End);
                 if (ocupacoes.Any())
@@ -170,9 +171,18 @@ public class AppointmentService(
             case AppointmentStatus.Canceled:
                 break;
         }
-        
-        await appointmentRepository.AddAppointmentAsync(appointment);
-        
+
+        try
+        {
+            await appointmentRepository.AddAppointmentAsync(appointment);
+        }
+        catch (Exception e)
+        {
+            // caso haja erro no banco, ele tenta deletar o evento criado na agenda externa
+            if (!string.IsNullOrEmpty(appointment.ExternalEventId))
+                await calendarService.CancelEventAsync(provider.CalendarId, appointment.ExternalEventId);
+            throw;
+        }
         
         return AppointmentOutDto.FromEntity(appointment);
     }
@@ -216,6 +226,7 @@ public class AppointmentService(
         return await appointmentRepository.SearchAppointmentsAsync(safeFilter);
     }
 
+    // apenas para testes:
     public async Task DeleteAppointmentAsync(Guid appointmentId)
     {
         throw new NotImplementedException();

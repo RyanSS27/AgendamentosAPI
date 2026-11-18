@@ -65,12 +65,12 @@ public class AppointmentRepository(ApplicationDbContext context) : IAppointmentR
         // Aqui ela é traduzida para SQL e executada, com o ToListAsync()
         return new PagedResult<Appointment>(items, totalCount, filter.Page, filter.PageSize);
     }
-    
-    public async Task<bool> HasConflictAsync(Guid providerId, DateTimeOffset start, DateTimeOffset end)
+
+    public async Task<bool> HasConflictAsync(Guid providerId, Guid customerId, DateTimeOffset start, DateTimeOffset end)
     {
         return await context.Appointments
             .AnyAsync(a => 
-                a.ProviderId == providerId &&
+                (a.ProviderId == providerId || a.CustomerId == customerId) &&
                 a.Status == AppointmentStatus.Scheduled && 
                 a.Start < end && 
                 a.End > start);
