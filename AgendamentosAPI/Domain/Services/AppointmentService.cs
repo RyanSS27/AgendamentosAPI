@@ -1,20 +1,24 @@
-using System.Data;
-using System.Runtime.CompilerServices;
 using AgendamentosAPI.Domain.Entities;
+using AgendamentosAPI.Domain.Entities.Enums;
 using AgendamentosAPI.Domain.Exceptions;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.RepositoryPorts;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
-using AgendamentosAPI.Dtos.Appointment;
+using AgendamentosAPI.Dtos.Appointments;
+using AgendamentosAPI.Dtos.Appointments.Filters;
 
 namespace AgendamentosAPI.Domain.Services;
 
 public class AppointmentService(
     IServiceProviderRepository providerRepository,
     ICustomerRepository customerRepository,
+    IAppointmentRepository appointmentRepository,
     ICalendarIntegrationService calendarService) : IAppointmentService
 {
     private const int MaxSearchPeriodDays = 35;
     private const int MaxAppointmentDurationMinutes = 90;
+    private const int MaxPageSize = 25;
+    private const int DefaultPageSize = 15;
     public Task<IReadOnlyCollection<TimePeriod>> GetBusyPeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end)
     {
         throw new NotImplementedException();
@@ -41,7 +45,7 @@ public class AppointmentService(
 
         var provider = await providerRepository.GetServiceProviderByIdAsync(providerId);
         if (provider is null)
-            throw new NotFoundException("Prestador de serviço não encontrado para o id '" + providerId + "'.");
+            throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{providerId}'.");
 
         if (provider.CalendarId is null)
             throw new DomainException("O Id do Calendário do prestador ainda não foi cadastrado.");
@@ -120,17 +124,148 @@ public class AppointmentService(
         return new FreeSlotsResponse(responseDays.AsReadOnly());
     }
 
-    public Task<AppointmentOutDto> CreateEventAsync(string calendarId, Appointment appointment)
+    public async Task<AppointmentOutDto> CreateEventAsync(AppointmentInputDto appointmentInput)
     {
-        throw new NotImplementedException();
+        var customer = await customerRepository.GetCustomerByIdAsync(appointmentInput.CustomerId);
+        if (customer is null)
+            throw new NotFoundException($"Não há um cliente registrado com Id '{appointmentInput.CustomerId}'.");
+
+        var provider = await providerRepository.GetServiceProviderByIdAsync(appointmentInput.ProviderId);
+        if (provider is null)
+            throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointmentInput.ProviderId}'.");
+
+        if (string.IsNullOrWhiteSpace(provider.CalendarId))
+            throw new DomainException($"O prestador de serviço {provider.Name} ainda não contém agenda cadastrada.");
+        
+        var appointment = new Appointment(
+            appointmentInput.ProviderId,
+            appointmentInput.CustomerId,
+            appointmentInput.Start,
+            appointmentInput.End,
+            appointmentInput.Title,
+            appointmentInput.Status,
+            observations: appointmentInput.Observations
+        );
+        
+        switch (appointment.Status)
+        {
+            case AppointmentStatus.Scheduled:
+                // Melhorar esse fluxo retornando de quem é o compromisso que vem gerando conflito: do cliente ou provider
+                var hasDbConflict = await appointmentRepository.HasConflictAsync(provider.Id, customer.Id, appointment.Start, appointment.End);
+                if (hasDbConflict)
+                    throw new DomainException("O período informado já possui um agendamento no sistema interno. Consulte os horários livres do prestador e se o cliente já não possui agendamento neste horário.");
+                
+                var ocupacoes = await calendarService.GetBusyPeriodsAsync(provider.CalendarId, appointment.Start, appointment.End);
+                if (ocupacoes.Any())
+                    throw new DomainException("O período informado está ocupado na agenda externa. Consulte os horários livres.");
+                
+                var externalId = await calendarService.CreateEventAsync(provider.CalendarId, appointment);
+                appointment.LinkExternalEvent(externalId);
+                break;
+
+            case AppointmentStatus.Completed:
+                var completedExternalId = await calendarService.CreateEventAsync(provider.CalendarId, appointment);
+                appointment.LinkExternalEvent(completedExternalId);
+                break;
+
+            case AppointmentStatus.Canceled:
+                break;
+        }
+
+        try
+        {
+            await appointmentRepository.AddAppointmentAsync(appointment);
+        }
+        catch (Exception e)
+        {
+            // caso haja erro no banco, ele tenta deletar o evento criado na agenda externa
+            if (!string.IsNullOrEmpty(appointment.ExternalEventId))
+                await calendarService.CancelEventAsync(provider.CalendarId, appointment.ExternalEventId);
+            throw;
+        }
+        
+        return AppointmentOutDto.FromEntity(appointment);
+    }
+    
+
+    public async Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentUpdateDto appointmentUpdate)
+    {
+        var appointment = await appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+        if (appointment is null)
+            throw new NotFoundException($"Não foi possível encontrar o agendamento de Id '{appointmentId}'.");
+
+        
+        appointment.UpdateDetails(appointmentUpdate.Title, appointmentUpdate.Observations); // não está reconhecendo os atributos
+
+
+        if (!string.IsNullOrWhiteSpace(appointment.ExternalEventId))
+        {
+            var provider = await providerRepository.GetServiceProviderByIdAsync(appointment.ProviderId);
+
+            if (provider is null)
+                throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointment.ProviderId}'.");
+            
+            if (string.IsNullOrWhiteSpace(provider.CalendarId))
+                throw new DomainException("O calendar id do prestador não está consta para o atualizar o evento na agenda externa.");
+            
+            await calendarService.UpdateEventAsync(provider.CalendarId, appointment);
+        }
+        
+        await appointmentRepository.UpdateAppointmentAsync(appointment);
+
+        return AppointmentOutDto.FromEntity(appointment);
     }
 
-    public Task<AppointmentOutDto> UpdateEventAsync(string calendarId, Appointment appointment)
+    public async Task<AppointmentOutDto> CancelEventAsync(Guid appointmentId)
     {
-        throw new NotImplementedException();
+        var appointment = await appointmentRepository.GetAppointmentByIdAsync(appointmentId);
+        if (appointment is null)
+            throw new NotFoundException($"Não foi possível encontrar o agendamento de Id '{appointmentId}'.");
+        
+        appointment.Cancel();
+        
+        if (!string.IsNullOrWhiteSpace(appointment.ExternalEventId))
+        {
+            var provider = await providerRepository.GetServiceProviderByIdAsync(appointment.ProviderId);
+            if (provider is null)
+                throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointment.ProviderId}'.");
+            
+            if (string.IsNullOrWhiteSpace(provider.CalendarId))
+                throw new DomainException("O calendar id do prestador não está consta para o atualizar o evento na agenda externa.");
+            
+            await calendarService.CancelEventAsync(provider.CalendarId, appointment.ExternalEventId);
+        }
+        
+        await appointmentRepository.UpdateAppointmentAsync(appointment);
+
+        return AppointmentOutDto.FromEntity(appointment);
     }
 
-    public Task<AppointmentOutDto> CancelEventAsync(string calendarId, string externalEventId)
+    public async Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter)
+    {
+        var page = filter.Page < 1 ? 1 : filter.Page;
+        int pageSize;
+        if (filter.PageSize > MaxPageSize)
+        {
+            pageSize = MaxPageSize;
+        }
+        else if (filter.PageSize < 1 )
+        {
+            pageSize = DefaultPageSize;
+        }
+        else
+        {
+            pageSize = filter.PageSize;
+        }
+            
+        // Cria um novo record higienizado copiando os demais valores (non-destructive mutation)
+        var safeFilter = filter with { Page = page, PageSize = pageSize };
+        
+        return await appointmentRepository.SearchAppointmentsAsync(safeFilter);
+    }
+
+    // apenas para testes:
+    public async Task DeleteAppointmentAsync(Guid appointmentId)
     {
         throw new NotImplementedException();
     }

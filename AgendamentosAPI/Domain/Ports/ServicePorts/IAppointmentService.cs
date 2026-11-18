@@ -1,5 +1,6 @@
 using AgendamentosAPI.Domain.Entities;
-using AgendamentosAPI.Dtos.Appointment;
+using AgendamentosAPI.Dtos.Appointments;
+using AgendamentosAPI.Dtos.Appointments.Filters;
 
 namespace AgendamentosAPI.Domain.Ports.ServicePorts;
 
@@ -7,9 +8,13 @@ public interface IAppointmentService
 {
     Task<IReadOnlyCollection<TimePeriod>> GetBusyPeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end);
     Task<FreeSlotsResponse> GetFreePeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end, TimeSpan duration);
-    Task<AppointmentOutDto> CreateEventAsync(string calendarId, Appointment appointment);
-    Task<AppointmentOutDto> UpdateEventAsync(string calendarId, Appointment appointment);
-    Task<AppointmentOutDto> CancelEventAsync(string calendarId, string externalEventId);
+    Task<AppointmentOutDto> CreateEventAsync(AppointmentInputDto appointmentInput);
+    Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentUpdateDto appointmentUpdate);
+    Task<AppointmentOutDto> CancelEventAsync(Guid appointmentId);
+    Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter);
+    
+    // Apenas para testes 
+    Task DeleteAppointmentAsync(Guid appointmentId);
 }
 
 public record TimePeriod(DateTimeOffset Start, DateTimeOffset End);

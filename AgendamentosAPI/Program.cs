@@ -2,6 +2,7 @@ using AgendamentosAPI.Adapters.Infrastructure;
 using AgendamentosAPI.Adapters.Infrastructure.ExternalServices;
 using AgendamentosAPI.Adapters.Infrastructure.Repositories;
 using AgendamentosAPI.Domain.Ports;
+using AgendamentosAPI.Domain.Ports.RepositoryPorts;
 using AgendamentosAPI.Domain.Ports.ServicePorts;
 using AgendamentosAPI.Domain.Services;
 using Microsoft.EntityFrameworkCore;
@@ -28,6 +29,7 @@ builder.Services.AddScoped<ICustomerRepository, CustomerRepository>();
 builder.Services.AddScoped<ICustomerService, CustomerService>();
 builder.Services.AddScoped<IServiceProviderRepository, ServiceProviderRepository>();
 builder.Services.AddScoped<IServiceProviderService, ServiceProviderService>();
+builder.Services.AddScoped<IAppointmentRepository, AppointmentRepository>();
 builder.Services.AddScoped<IAppointmentService, AppointmentService>();
 // Registra o Provider de Token e o Adapter do Calendar
 builder.Services.AddScoped<IGoogleTokenProvider, GoogleServiceAccountTokenProvider>();
