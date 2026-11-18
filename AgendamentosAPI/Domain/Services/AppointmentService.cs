@@ -188,15 +188,35 @@ public class AppointmentService(
     }
     
 
-    public async Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentInputDto appointmentInput)
+    public async Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentUpdateDto appointmentUpdate)
     {
         var appointment = await appointmentRepository.GetAppointmentByIdAsync(appointmentId);
-        
+        if (appointment is null)
+            throw new NotFoundException($"Não foi possível encontrar o agendamento de Id '{appointmentId}'.");
 
-        throw new NotImplementedException();
+        
+        appointment.UpdateDetails(appointmentUpdate.Title, appointmentUpdate.Observations); // não está reconhecendo os atributos
+
+
+        if (!string.IsNullOrWhiteSpace(appointment.ExternalEventId))
+        {
+            var provider = await providerRepository.GetServiceProviderByIdAsync(appointment.ProviderId);
+
+            if (provider is null)
+                throw new NotFoundException($"Não há um prestador de serviço registrado com Id '{appointment.ProviderId}'.");
+            
+            if (string.IsNullOrWhiteSpace(provider.CalendarId))
+                throw new DomainException("O calendar id do prestador não está consta para o atualizar o evento na agenda externa.");
+            
+            await calendarService.UpdateEventAsync(provider.CalendarId, appointment);
+        }
+        
+        await appointmentRepository.UpdateAppointmentAsync(appointment);
+
+        return AppointmentOutDto.FromEntity(appointment);
     }
 
-    public Task<AppointmentOutDto> CancelEventAsync(string calendarId, string externalEventId)
+    public async Task<AppointmentOutDto> CancelEventAsync(Guid appointmentId)
     {
         throw new NotImplementedException();
     }
@@ -204,9 +224,7 @@ public class AppointmentService(
     public async Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter)
     {
         var page = filter.Page < 1 ? 1 : filter.Page;
-        var pageSize = filter.PageSize > MaxPageSize 
-            ? MaxPageSize 
-            : (filter.PageSize < 1 ? DefaultPageSize : filter.PageSize);
+        int pageSize;
         if (filter.PageSize > MaxPageSize)
         {
             pageSize = MaxPageSize;
@@ -220,7 +238,7 @@ public class AppointmentService(
             pageSize = filter.PageSize;
         }
             
-        // 2. Cria um novo record higienizado copiando os demais valores (non-destructive mutation)
+        // Cria um novo record higienizado copiando os demais valores (non-destructive mutation)
         var safeFilter = filter with { Page = page, PageSize = pageSize };
         
         return await appointmentRepository.SearchAppointmentsAsync(safeFilter);

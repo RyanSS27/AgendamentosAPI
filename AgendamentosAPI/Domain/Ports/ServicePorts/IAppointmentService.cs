@@ -9,8 +9,8 @@ public interface IAppointmentService
     Task<IReadOnlyCollection<TimePeriod>> GetBusyPeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end);
     Task<FreeSlotsResponse> GetFreePeriodsSlotsAsync(Guid providerId, DateOnly start, DateOnly end, TimeSpan duration);
     Task<AppointmentOutDto> CreateEventAsync(AppointmentInputDto appointmentInput);
-    Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentInputDto appointmentInput);
-    Task<AppointmentOutDto> CancelEventAsync(string calendarId, string externalEventId);
+    Task<AppointmentOutDto> UpdateEventAsync(Guid appointmentId, AppointmentUpdateDto appointmentUpdate);
+    Task<AppointmentOutDto> CancelEventAsync(Guid appointmentId);
     Task<PagedResult<Appointment>> SearchAppointmentAsync(AppointmentFilter filter);
     
     // Apenas para testes 
